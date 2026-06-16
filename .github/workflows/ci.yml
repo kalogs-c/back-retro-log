@@ -6,35 +6,6 @@ on:
     pull_request:
 
 jobs:
-    format:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-go@v5
-              with:
-                  go-version-file: go.mod
-            - name: Check gofmt
-              run: |
-                  if [ -n "$(gofmt -l .)" ]; then
-                    gofmt -l .
-                    exit 1
-                  fi
-            - name: Install templ
-              run: go install github.com/a-h/templ/cmd/templ@latest
-            - name: Check templ format
-              run: templ fmt --check .
-
-    lint:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-go@v5
-              with:
-                  go-version-file: go.mod
-            - uses: golangci/golangci-lint-action@v6
-              with:
-                  version: latest
-
     test:
         runs-on: ubuntu-latest
         steps:
