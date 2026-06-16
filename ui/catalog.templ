@@ -1,0 +1,27 @@
+package ui
+
+import "back-retro-log/internal/db"
+
+templ CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) {
+	<h1>My Catalog</h1>
+	<div class="catalog-toolbar">
+		<select
+			name="status"
+			hx-get="/catalog"
+			hx-trigger="change"
+			hx-target="#catalog-cards"
+			hx-push-url="true"
+		>
+			<option value="">All</option>
+			for _, s := range AllStatuses() {
+				<option value={ s }
+					if currentStatus == s {
+						selected
+					}
+				>{ StatusLabels[s] }</option>
+			}
+		</select>
+		<a href="/search" class="button">+ Add Game</a>
+	</div>
+	@CatalogCardList(entries)
+}

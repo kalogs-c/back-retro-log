@@ -1,0 +1,41 @@
+package ui
+
+import "back-retro-log/internal/db"
+
+templ InvitePage(invitations []db.Invitation, link string) {
+	<h1>Invitations</h1>
+	if link != "" {
+		<div class="invite-link">
+			<p>Share this link (expires in 24h):</p>
+			<input type="text" readonly value={ link }>
+		</div>
+	}
+	<form action="/invite" method="POST">
+		<button type="submit">Generate Invitation</button>
+	</form>
+	<h2>Previous Invitations</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Token</th>
+				<th>Expires</th>
+				<th>Used</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, inv := range invitations {
+				<tr>
+					<td><code>{ inv.Token[:8] }...</code></td>
+					<td>{ inv.ExpiresAt }</td>
+					<td>
+						if inv.UsedBy.Valid {
+							Used
+						} else {
+							Pending
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

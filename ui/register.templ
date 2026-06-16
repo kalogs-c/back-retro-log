@@ -1,0 +1,22 @@
+package ui
+
+templ RegisterPage(token string, errorMsg string) {
+	<div class="form-page">
+		<h1>Create Account</h1>
+		if errorMsg != "" {
+			<p class="error">{ errorMsg }</p>
+		}
+		<form action="/register" method="POST">
+			<input type="hidden" name="token" value={ token }>
+			<label>
+				Username
+				<input type="text" name="username" required minlength="3">
+			</label>
+			<label>
+				Password
+				<input type="password" name="password" required minlength="6">
+			</label>
+			<button type="submit">Register</button>
+		</form>
+	</div>
+}

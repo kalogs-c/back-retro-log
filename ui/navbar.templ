@@ -1,0 +1,16 @@
+package ui
+
+templ Navbar(loggedIn bool) {
+	<nav>
+		<a href="/">BackRetroLog</a>
+		if loggedIn {
+			<div class="nav-links">
+				<a href="/catalog">Catalog</a>
+				<a href="/invite">Invites</a>
+				<form action="/logout" method="POST" class="logout-form">
+					<button type="submit">Logout</button>
+				</form>
+			</div>
+		}
+	</nav>
+}

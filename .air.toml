@@ -1,0 +1,27 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "templ generate && go build -o ./tmp/main ."
+  bin = "./tmp/main"
+  include_ext = ["go", "templ"]
+  exclude_dir = ["tmp", "static"]
+  exclude_file = []
+  exclude_regex = [".*_templ.go"]
+  exclude_unchanged = true
+  full_bin = ""
+  log = "build-errors.log"
+  poll = false
+  delay = 0
+
+[log]
+  main_only = false
+
+[color]
+  main = "green"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "magenta"
+
+[misc]
+  clean_on_exit = true

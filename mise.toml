@@ -1,0 +1,24 @@
+[tools]
+"aqua:a-h/templ" = "latest"
+go = "latest"
+sqlc = "latest"
+
+[tasks."templ:generate"]
+description = "Compile .templ files to Go"
+run = "templ generate"
+
+[tasks."sqlc:generate"]
+description = "Generate Go code from SQL queries"
+run = "sqlc generate"
+
+[tasks.generate]
+description = "Run all code generators"
+depends = ["templ:generate", "sqlc:generate"]
+
+[tasks.dev]
+description = "Run development server with live reload"
+run = "air"
+
+[tasks.build]
+description = "Build the application"
+run = "templ generate && go build -o backlog ."

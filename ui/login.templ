@@ -1,0 +1,26 @@
+package ui
+
+templ LoginPage(errorMsg string, usersExist bool) {
+	<div class="form-page">
+		<h1>Login</h1>
+		if errorMsg != "" {
+			<p class="error">{ errorMsg }</p>
+		}
+		<form action="/login" method="POST">
+			<label>
+				Username
+				<input type="text" name="username" required>
+			</label>
+			<label>
+				Password
+				<input type="password" name="password" required>
+			</label>
+			<button type="submit">Login</button>
+		</form>
+		if usersExist {
+			<p>No account? You need an invitation link to register.</p>
+		} else {
+			<p>No account? First visitor can <a href="/register">register</a>.</p>
+		}
+	</div>
+}

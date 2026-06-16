@@ -1,0 +1,328 @@
+body {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+    font-size: 12px;
+    background: #1a1a2e;
+    color: #d4d4d4;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: #2d2d3d;
+    border: 2px solid;
+    border-color: #4a4a5a #0a0a0a #0a0a0a #4a4a5a;
+    padding: 4px 6px;
+}
+
+nav a {
+    color: #d4d4d4;
+    text-decoration: none;
+    padding: 2px 4px;
+}
+
+nav a:hover {
+    color: #5b9bd5;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-page {
+    max-width: 400px;
+    margin: 2rem auto;
+    background: #2d2d3d;
+    border: 2px solid;
+    border-color: #4a4a5a #0a0a0a #0a0a0a #4a4a5a;
+    padding: 1rem;
+}
+
+.form-page h1 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.form-page label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-page label input {
+    display: block;
+    margin-top: 2px;
+}
+
+.error {
+    margin-bottom: 1rem;
+    color: #d4731a;
+    font-weight: bold;
+}
+
+button,
+a.button {
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+    font-size: 12px;
+    background: #3d3d4d;
+    border: 2px outset;
+    border-color: #5a5a6a #0a0a0a #0a0a0a #5a5a6a;
+    padding: 2px 12px;
+    cursor: pointer;
+    color: #d4d4d4;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover,
+a.button:hover {
+    background: #4787c4;
+    border-color: #6aa7e4 #0a0a0a #0a0a0a #6aa7e4;
+    color: #fff;
+}
+
+button:active,
+a.button:active {
+    border: 2px inset;
+    border-color: #0a0a0a #5a5a6a #5a5a6a #0a0a0a;
+    background: #2a5a7a;
+}
+
+input[type="text"],
+input[type="password"] {
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+    font-size: 12px;
+    border: 2px inset;
+    border-color: #0a0a0a #4a4a5a #4a4a5a #0a0a0a;
+    background: #1a1a2e;
+    color: #d4d4d4;
+    padding: 2px 4px;
+    outline: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #4787c4;
+}
+
+select {
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+    font-size: 12px;
+    border: 2px inset;
+    border-color: #0a0a0a #4a4a5a #4a4a5a #0a0a0a;
+    background: #1a1a2e;
+    color: #d4d4d4;
+    padding: 2px 4px;
+    outline: none;
+    appearance: auto;
+}
+
+.filters {
+    margin-bottom: 1rem;
+}
+
+.filters a {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    margin-right: 0.3rem;
+}
+
+.game-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cover-thumb {
+    width: 40px;
+    height: 56px;
+    object-fit: cover;
+}
+
+.search-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.catalog-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.game-card {
+    border: 1px solid #0a0a0a;
+    background: #2d2d3d;
+    padding: 0.5rem;
+    width: 200px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-top {
+    flex: 1;
+}
+
+.card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: auto;
+}
+
+.card-actions select,
+.card-actions button {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.85rem;
+}
+
+.game-card .cover {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.cover-placeholder {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 0.5rem;
+    background:
+        linear-gradient(45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(-45deg, #1a1a2e 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1a1a2e 75%),
+        linear-gradient(-45deg, transparent 75%, #1a1a2e 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #252540;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-placeholder::after {
+    content: "?";
+    font-size: 48px;
+    font-weight: bold;
+    color: #4a4a6a;
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+}
+
+.game-details h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.release {
+    font-size: 0.75rem;
+    color: #808098;
+}
+
+.logout-form {
+    display: inline;
+}
+
+.logout-form button {
+    background: #3d3d4d;
+    border: 2px outset;
+    border-color: #5a5a6a #0a0a0a #0a0a0a #5a5a6a;
+    cursor: pointer;
+    font-family: "MS Sans Serif", "Tahoma", "Geneva", sans-serif;
+    font-size: 12px;
+    padding: 2px 12px;
+    text-decoration: none;
+    color: #d4d4d4;
+}
+
+.logout-form button:hover {
+    background: #4787c4;
+    border-color: #6aa7e4 #0a0a0a #0a0a0a #6aa7e4;
+    color: #fff;
+}
+
+.logout-form button:active {
+    border: 2px inset;
+    border-color: #0a0a0a #5a5a6a #5a5a6a #0a0a0a;
+    background: #2a5a7a;
+}
+
+.invite-link input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.invite-link {
+    background: #2d2d3d;
+    border: 2px solid;
+    border-color: #4a4a5a #0a0a0a #0a0a0a #4a4a5a;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.catalog-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: #2d2d3d;
+    border: 2px solid;
+    border-color: #4a4a5a #0a0a0a #0a0a0a #4a4a5a;
+    padding: 6px;
+}
+
+.empty {
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1a1a2e;
+    border: 2px inset;
+    border-color: #0a0a0a #4a4a5a #4a4a5a #0a0a0a;
+}
+
+table th,
+table td {
+    border: 1px solid #0a0a0a;
+    padding: 3px 6px;
+    text-align: left;
+    font-size: 12px;
+}
+
+table th {
+    background: #2d2d3d;
+    font-weight: bold;
+    color: #d4d4d4;
+}
+
+h1 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0 0 0.75rem 0;
+    color: #d4d4d4;
+}
+
+h2 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem 0;
+    color: #d4d4d4;
+}
+
+a {
+    color: #5b9bd5;
+}
+
+a:visited {
+    color: #8a7fb5;
+}

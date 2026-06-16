@@ -1,0 +1,108 @@
+package ui
+
+import (
+	"back-retro-log/internal/db"
+	"fmt"
+)
+
+templ EntryRow(entry db.ListCatalogEntriesRow) {
+	<tr id={ fmt.Sprintf("entry-%d", entry.ID) } hx-target="this" hx-swap="outerHTML">
+		<td class="game-info">
+			if StrVal(entry.CoverUrl) != "" {
+				<img src={ entry.CoverUrl.String } alt={ entry.Title } class="cover-thumb"/>
+			}
+			<span class="game-title">{ entry.Title }</span>
+		</td>
+		<td>
+			<select
+				name="status"
+				hx-put={ fmt.Sprintf("/catalog/%d/status", entry.ID) }
+				hx-trigger="change"
+			>
+				for _, s := range AllStatuses() {
+					<option value={ s }
+						if s == entry.Status {
+							selected
+						}
+					>{ StatusLabels[s] }</option>
+				}
+			</select>
+		</td>
+		<td class="actions">
+			<button
+				hx-delete={ fmt.Sprintf("/catalog/%d", entry.ID) }
+				hx-confirm="Remove this game from your catalog?"
+			>Remove</button>
+		</td>
+	</tr>
+}
+
+templ CatalogCard(entry db.ListCatalogEntriesRow) {
+	<div class="game-card" id={ fmt.Sprintf("card-%d", entry.ID) }>
+		<div class="card-top">
+			if StrVal(entry.CoverUrl) != "" {
+				<img src={ entry.CoverUrl.String } alt={ entry.Title } class="cover"/>
+			} else {
+				<div class="cover-placeholder"></div>
+			}
+			<div class="game-details">
+				<h3>{ entry.Title }</h3>
+			</div>
+		</div>
+		<div class="card-actions">
+			<select
+				name="status"
+				hx-put={ fmt.Sprintf("/catalog/%d/status", entry.ID) }
+				hx-trigger="change"
+				hx-target={ fmt.Sprintf("#card-%d", entry.ID) }
+				hx-swap="outerHTML"
+			>
+				for _, s := range AllStatuses() {
+					<option value={ s }
+						if s == entry.Status {
+							selected
+						}
+					>{ StatusLabels[s] }</option>
+				}
+			</select>
+			<button
+				hx-delete={ fmt.Sprintf("/catalog/%d", entry.ID) }
+				hx-confirm="Remove this game from your catalog?"
+				hx-target="closest .game-card"
+				hx-swap="delete"
+				class="remove-btn"
+			>Remove</button>
+		</div>
+	</div>
+}
+
+templ CatalogCardList(entries []db.ListCatalogEntriesRow) {
+	<div id="catalog-cards" class="catalog-cards">
+		for _, e := range entries {
+			@CatalogCard(e)
+		}
+		if len(entries) == 0 {
+			<p class="empty">No games yet. <a href="/search">Add some!</a></p>
+		}
+	</div>
+}
+
+templ EntryList(entries []db.ListCatalogEntriesRow) {
+	<table id="entry-list">
+		<thead>
+			<tr>
+				<th>Game</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, e := range entries {
+				@EntryRow(e)
+			}
+			if len(entries) == 0 {
+				<tr><td colspan="3">No games yet. <a href="/search">Search and add some!</a></td></tr>
+			}
+		</tbody>
+	</table>
+}
