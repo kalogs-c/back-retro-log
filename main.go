@@ -20,8 +20,8 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-//go:embed sql/migrations/*.sql
-var migrationFS embed.FS
+//go:embed sql/migrations/*.sql static/*
+var staticFS embed.FS
 
 func main() {
 	cfg := config.Load()
@@ -58,7 +58,7 @@ func main() {
 		baseURL = "http://localhost:3000"
 	}
 
-	router := app.NewRouter(queries, sessionMgr, gameProvider, baseURL)
+	router := app.NewRouter(queries, sessionMgr, gameProvider, baseURL, staticFS)
 
 	go func() {
 		sessionMgr.Cleanup()
@@ -71,7 +71,7 @@ func main() {
 }
 
 func runMigrations(sqlDB *sql.DB) error {
-	entries, err := migrationFS.ReadDir("sql/migrations")
+	entries, err := staticFS.ReadDir("sql/migrations")
 	if err != nil {
 		return fmt.Errorf("failed to read migrations: %w", err)
 	}
@@ -84,7 +84,7 @@ func runMigrations(sqlDB *sql.DB) error {
 		if !strings.HasSuffix(entry.Name(), ".sql") {
 			continue
 		}
-		content, err := migrationFS.ReadFile("sql/migrations/" + entry.Name())
+		content, err := staticFS.ReadFile("sql/migrations/" + entry.Name())
 		if err != nil {
 			return fmt.Errorf("failed to read %s: %w", entry.Name(), err)
 		}

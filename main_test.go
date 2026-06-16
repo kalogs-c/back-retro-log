@@ -37,7 +37,7 @@ func testApp(t *testing.T) (queries *db.Queries, sessions *auth.SessionManager, 
 	queries = db.New(sqlDB)
 	sessions = auth.NewSessionManager(queries)
 	provider := providers.NewDummy()
-	router = app.NewRouter(queries, sessions, provider, "http://test.local")
+	router = app.NewRouter(queries, sessions, provider, "http://test.local", staticFS)
 	return
 }
 

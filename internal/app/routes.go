@@ -1,6 +1,7 @@
 package app
 
 import (
+	"io/fs"
 	"net/http"
 
 	"back-retro-log/internal/auth"
@@ -14,6 +15,7 @@ func NewRouter(
 	sessions *auth.SessionManager,
 	provider providers.GameProvider,
 	baseURL string,
+	staticFS fs.FS,
 ) http.Handler {
 	authH := &handlers.AuthHandler{
 		Queries:  queries,
@@ -34,8 +36,8 @@ func NewRouter(
 	mux.HandleFunc("GET /register", authH.RegisterPage)
 	mux.HandleFunc("POST /register", authH.Register)
 
-	staticFS := http.FileServer(http.Dir("static"))
-	mux.Handle("GET /static/", http.StripPrefix("/static/", staticFS))
+	sub, _ := fs.Sub(staticFS, "static")
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(sub))))
 
 	protected := http.NewServeMux()
 	protected.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
