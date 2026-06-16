@@ -3,3 +3,10 @@ tmp/
 data/
 *.log
 .env
+
+# Terraform
+deploy/.terraform/
+deploy/terraform.tfvars
+deploy/*.plan
+deploy/*.tfstate
+deploy/*.tfstate.*

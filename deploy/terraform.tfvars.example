@@ -1,0 +1,7 @@
+project_id    = "YOUR_PROJECT_ID"
+vm_name       = "backretrolog-vm"
+ip_name       = "backretrolog-ip"
+docker_image  = "kalogsc/back-retro-log:latest"
+rawg_api_key  = "YOUR_RAWG_API_KEY"
+base_url      = ""
+disk_size     = 10

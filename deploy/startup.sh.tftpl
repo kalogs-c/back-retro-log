@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e -x
+
+DATA_DISK="/dev/disk/by-id/google-backretrolog-data"
+MOUNT_POINT="/var/lib/backretrolog/data"
+
+# Format and mount the data disk
+if [ "$(blkid -o value -s TYPE $${DATA_DISK})" = "" ]; then
+  mkfs.ext4 $${DATA_DISK}
+fi
+
+mkdir -p $${MOUNT_POINT}
+mountpoint -q $${MOUNT_POINT} || mount $${DATA_DISK} $${MOUNT_POINT}
+
+# Detect external IP for BASE_URL if not set
+BASE_URL="${base_url}"
+if [ "$${BASE_URL}" = "" ]; then
+  EXTERNAL_IP=$(curl -s -H "Metadata-Flavor: Google" \
+    "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip")
+  BASE_URL="http://$${EXTERNAL_IP}"
+fi
+
+# Pull latest image
+docker pull ${docker_image}
+
+# Stop and remove old container
+docker stop backretrolog 2>/dev/null || true
+docker rm backretrolog 2>/dev/null || true
+
+# Run the container
+docker run -d \
+  --name backretrolog \
+  --restart always \
+  -p 80:3000 \
+  -e ADDR=":3000" \
+  -e DB_PATH="/data/backretrolog.db" \
+  -e RAWG_API_KEY="${rawg_api_key}" \
+  -e BASE_URL="$${BASE_URL}" \
+  -v $${MOUNT_POINT}:/data \
+  ${docker_image}
+
+# Wait for app to be healthy
+for i in $(seq 1 30); do
+  curl -sf http://localhost:3000/health >/dev/null 2>&1 && break
+  sleep 2
+done
