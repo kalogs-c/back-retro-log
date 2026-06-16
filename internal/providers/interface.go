@@ -11,6 +11,8 @@ type Game struct {
 }
 
 type GameProvider interface {
-	Search(ctx context.Context, query string) ([]Game, error)
+	Search(ctx context.Context, query string, page int) ([]Game, int, error)
 	GetByID(ctx context.Context, id int) (*Game, error)
 }
+
+const PageSize = 20

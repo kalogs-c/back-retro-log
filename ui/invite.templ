@@ -7,7 +7,10 @@ templ InvitePage(invitations []db.Invitation, link string) {
 	if link != "" {
 		<div class="invite-link">
 			<p>Share this link (expires in 24h):</p>
-			<input type="text" readonly value={ link }>
+			<div class="invite-row">
+				<input type="text" readonly value={ link }>
+				<button type="button" class="copy-btn" onclick="copyInvite()" aria-label="Copy invitation link">Copy</button>
+			</div>
 		</div>
 	}
 	<form action="/invite" method="POST">

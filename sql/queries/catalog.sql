@@ -20,7 +20,8 @@ SELECT ce.id, ce.user_id, ce.game_id, ce.status, ce.created_at, ce.updated_at,
 FROM catalog_entries ce
 JOIN games g ON ce.game_id = g.id
 WHERE ce.user_id = ?
-ORDER BY ce.updated_at DESC;
+ORDER BY ce.updated_at DESC
+LIMIT ? OFFSET ?;
 
 -- name: ListCatalogEntriesByStatus :many
 SELECT ce.id, ce.user_id, ce.game_id, ce.status, ce.created_at, ce.updated_at,
@@ -28,6 +29,21 @@ SELECT ce.id, ce.user_id, ce.game_id, ce.status, ce.created_at, ce.updated_at,
 FROM catalog_entries ce
 JOIN games g ON ce.game_id = g.id
 WHERE ce.user_id = ? AND ce.status = ?
+ORDER BY ce.updated_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: CountCatalogEntries :one
+SELECT COUNT(*) FROM catalog_entries WHERE user_id = ?;
+
+-- name: CountCatalogEntriesByStatus :one
+SELECT COUNT(*) FROM catalog_entries WHERE user_id = ? AND status = ?;
+
+-- name: SearchCatalogEntries :many
+SELECT ce.id, ce.user_id, ce.game_id, ce.status, ce.created_at, ce.updated_at,
+       g.title, g.cover_url, g.description, g.release_date
+FROM catalog_entries ce
+JOIN games g ON ce.game_id = g.id
+WHERE ce.user_id = ? AND g.title LIKE ?
 ORDER BY ce.updated_at DESC;
 
 -- name: UpdateCatalogEntryStatus :exec

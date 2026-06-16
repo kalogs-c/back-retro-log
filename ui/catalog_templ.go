@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "back-retro-log/internal/db"
 
-func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) templ.Component {
+func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string, page int, totalPages int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -31,7 +31,7 @@ func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) templ
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>My Catalog</h1><div class=\"catalog-toolbar\"><select name=\"status\" hx-get=\"/catalog\" hx-trigger=\"change\" hx-target=\"#catalog-cards\" hx-push-url=\"true\"><option value=\"\">All</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>My Catalog</h1><div class=\"catalog-toolbar\"><input type=\"text\" name=\"q\" placeholder=\"Search catalog...\" aria-label=\"Search your catalog\" hx-get=\"/catalog/search\" hx-trigger=\"keyup changed delay:300ms\" hx-target=\"#catalog-cards\" hx-push-url=\"true\" hx-indicator=\"closest .catalog-toolbar\"> <select name=\"status\" aria-label=\"Filter by status\" hx-get=\"/catalog\" hx-trigger=\"change\" hx-target=\"#catalog-cards\" hx-push-url=\"true\" hx-indicator=\"closest .catalog-toolbar\"><option value=\"\">All</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -43,7 +43,7 @@ func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) templ
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(s)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/catalog.templ`, Line: 17, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/catalog.templ`, Line: 30, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 			if templ_7745c5c3_Err != nil {
@@ -66,7 +66,7 @@ func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) templ
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(StatusLabels[s])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/catalog.templ`, Line: 21, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/catalog.templ`, Line: 34, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -77,11 +77,11 @@ func CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string) templ
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</select> <a href=\"/search\" class=\"button\">+ Add Game</a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</select> <a href=\"/search\" class=\"button\">+ Add Game</a> <span class=\"htmx-indicator loading-spinner\" aria-label=\"Loading\"></span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = CatalogCardList(entries).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = CatalogCardList(entries, page, totalPages, currentStatus).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

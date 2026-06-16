@@ -8,8 +8,8 @@ func NewDummy() GameProvider {
 	return &dummyProvider{}
 }
 
-func (d *dummyProvider) Search(_ context.Context, query string) ([]Game, error) {
-	return []Game{
+func (d *dummyProvider) Search(_ context.Context, query string, page int) ([]Game, int, error) {
+	all := []Game{
 		{
 			RawgID:      1,
 			Title:       "The Legend of Zelda: Breath of the Wild",
@@ -24,7 +24,16 @@ func (d *dummyProvider) Search(_ context.Context, query string) ([]Game, error) 
 			Description: "An action RPG set in a vast fantasy world.",
 			ReleaseDate: "2022-02-25",
 		},
-	}, nil
+	}
+	start := (page - 1) * PageSize
+	if start >= len(all) {
+		return nil, len(all), nil
+	}
+	end := start + PageSize
+	if end > len(all) {
+		end = len(all)
+	}
+	return all[start:end], len(all), nil
 }
 
 func (d *dummyProvider) GetByID(_ context.Context, id int) (*Game, error) {

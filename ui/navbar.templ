@@ -2,7 +2,7 @@ package ui
 
 templ Navbar(loggedIn bool) {
 	<nav>
-		<a href="/">BackRetroLog</a>
+		<a href="/" aria-label="Home">BackRetroLog</a>
 		if loggedIn {
 			<div class="nav-links">
 				<a href="/catalog">Catalog</a>

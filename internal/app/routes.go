@@ -31,6 +31,11 @@ func NewRouter(
 
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	mux.HandleFunc("GET /login", authH.LoginPage)
 	mux.HandleFunc("POST /login", authH.Login)
 	mux.HandleFunc("GET /register", authH.RegisterPage)
@@ -47,6 +52,7 @@ func NewRouter(
 	protected.HandleFunc("POST /logout", authH.Logout)
 	protected.HandleFunc("GET /catalog", catalogH.List)
 	protected.HandleFunc("GET /catalog/", catalogH.List)
+	protected.HandleFunc("GET /catalog/search", catalogH.Search)
 	protected.HandleFunc("POST /catalog/add", catalogH.Add)
 	protected.HandleFunc("PUT /catalog/{id}/status", catalogH.UpdateStatus)
 	protected.HandleFunc("DELETE /catalog/{id}", catalogH.Delete)

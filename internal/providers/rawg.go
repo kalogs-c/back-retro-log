@@ -22,49 +22,50 @@ func NewRAWG(apiKey string) GameProvider {
 }
 
 type rawgGame struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	Slug    string `json:"slug"`
-	Rating  float64 `json:"rating"`
+	ID              int     `json:"id"`
+	Name            string  `json:"name"`
+	Slug            string  `json:"slug"`
+	Rating          float64 `json:"rating"`
 	BackgroundImage *string `json:"background_image"`
-	Released *string `json:"released"`
-	DescriptionRaw string `json:"description_raw"`
+	Released        *string `json:"released"`
+	DescriptionRaw  string  `json:"description_raw"`
 }
 
 type rawgSearchResponse struct {
 	Results []rawgGame `json:"results"`
+	Count   int        `json:"count"`
 }
 
 type rawgDetailResponse struct {
-	ID              int    `json:"id"`
-	Name            string `json:"name"`
-	DescriptionRaw  string `json:"description_raw"`
+	ID              int     `json:"id"`
+	Name            string  `json:"name"`
+	DescriptionRaw  string  `json:"description_raw"`
 	BackgroundImage *string `json:"background_image"`
 	Released        *string `json:"released"`
 }
 
-func (p *rawgProvider) Search(ctx context.Context, query string) ([]Game, error) {
-	u := fmt.Sprintf("https://api.rawg.io/api/games?key=%s&search=%s&page_size=20",
-		p.apiKey, url.QueryEscape(query))
+func (p *rawgProvider) Search(ctx context.Context, query string, page int) ([]Game, int, error) {
+	u := fmt.Sprintf("https://api.rawg.io/api/games?key=%s&search=%s&page_size=%d&page=%d",
+		p.apiKey, url.QueryEscape(query), PageSize, page)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, 0, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := p.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to call RAWG: %w", err)
+		return nil, 0, fmt.Errorf("failed to call RAWG: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("RAWG returned status %d", resp.StatusCode)
+		return nil, 0, fmt.Errorf("RAWG returned status %d", resp.StatusCode)
 	}
 
 	var searchResp rawgSearchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+		return nil, 0, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	games := make([]Game, 0, len(searchResp.Results))
@@ -82,7 +83,7 @@ func (p *rawgProvider) Search(ctx context.Context, query string) ([]Game, error)
 		}
 		games = append(games, game)
 	}
-	return games, nil
+	return games, searchResp.Count, nil
 }
 
 func (p *rawgProvider) GetByID(ctx context.Context, id int) (*Game, error) {

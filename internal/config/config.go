@@ -5,9 +5,9 @@ import (
 )
 
 type Config struct {
-	Addr     string
-	DBPath   string
-	RAWGKey  string
+	Addr    string
+	DBPath  string
+	RAWGKey string
 }
 
 func Load() Config {

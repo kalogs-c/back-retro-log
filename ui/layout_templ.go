@@ -42,7 +42,7 @@ func Layout(title string, loggedIn bool, content templ.Component) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - BackRetroLog</title><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - BackRetroLog</title><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body><a href=\"#main-content\" class=\"skip-link\">Skip to content</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +50,7 @@ func Layout(title string, loggedIn bool, content templ.Component) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<main id=\"main-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -58,7 +58,7 @@ func Layout(title string, loggedIn bool, content templ.Component) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</main></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</main><div id=\"toast\" class=\"toast\" hidden role=\"status\" aria-live=\"polite\"></div><div id=\"confirm-dialog\" class=\"confirm-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Confirm action\"><div class=\"confirm-content\"><p id=\"confirm-message\"></p><div class=\"confirm-buttons\"><button id=\"confirm-yes\">Yes</button> <button id=\"confirm-no\">No</button></div></div></div><script>\n\t\t\t\tdocument.addEventListener('htmx:beforeOnLoad', function(evt) {\n\t\t\t\t\tif (evt.detail.xhr.status >= 400) {\n\t\t\t\t\t\tevt.stopPropagation();\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\t\t\tvar header = evt.detail.xhr.getResponseHeader('HX-Trigger');\n\t\t\t\t\tif (header) {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tvar data = JSON.parse(header);\n\t\t\t\t\t\t\tif (data.showToast) {\n\t\t\t\t\t\t\t\tshowToast(data.showToast.message, data.showToast.type || 'info');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} catch(e) {}\n\t\t\t\t\t}\n\t\t\t\t\tif (evt.detail.failed) {\n\t\t\t\t\t\tvar msg = evt.detail.xhr.responseText || 'Request failed';\n\t\t\t\t\t\tshowToast(msg, 'error');\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tdocument.addEventListener('htmx:confirm', function(evt) {\n\t\t\t\t\tif (!evt.detail.question) return;\n\t\t\t\t\tevt.preventDefault();\n\t\t\t\t\tvar dialog = document.getElementById('confirm-dialog');\n\t\t\t\t\tvar msg = document.getElementById('confirm-message');\n\t\t\t\t\tmsg.textContent = evt.detail.question;\n\t\t\t\t\tdialog.classList.add('show');\n\t\t\t\t\tdialog.querySelector('#confirm-yes').onclick = function() {\n\t\t\t\t\t\tdialog.classList.remove('show');\n\t\t\t\t\t\tevt.detail.issueRequest(true);\n\t\t\t\t\t};\n\t\t\t\t\tdialog.querySelector('#confirm-no').onclick = function() {\n\t\t\t\t\t\tdialog.classList.remove('show');\n\t\t\t\t\t};\n\t\t\t\t});\n\n\t\t\t\tfunction showToast(msg, type) {\n\t\t\t\t\tvar t = document.getElementById('toast');\n\t\t\t\t\tt.textContent = msg;\n\t\t\t\t\tt.className = 'toast toast-' + (type || 'info');\n\t\t\t\t\tt.hidden = false;\n\t\t\t\t\tt.style.animation = 'none';\n\t\t\t\t\tvoid t.offsetHeight;\n\t\t\t\t\tt.style.animation = '';\n\t\t\t\t\tsetTimeout(function() { t.hidden = true; }, 3000);\n\t\t\t\t}\n\n\t\t\t\tfunction copyInvite() {\n\t\t\t\t\tvar input = document.querySelector('.invite-link input');\n\t\t\t\t\tif (input) {\n\t\t\t\t\t\tnavigator.clipboard.writeText(input.value).then(function() {\n\t\t\t\t\t\t\tshowToast('Link copied!', 'success');\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

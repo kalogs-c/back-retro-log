@@ -11,10 +11,80 @@ templ Layout(title string, loggedIn bool, content templ.Component) {
 			<link rel="stylesheet" href="/static/style.css">
 		</head>
 		<body>
+			<a href="#main-content" class="skip-link">Skip to content</a>
 			@Navbar(loggedIn)
-			<main>
+			<main id="main-content">
 				@content
 			</main>
+			<div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+			<div id="confirm-dialog" class="confirm-dialog" role="dialog" aria-modal="true" aria-label="Confirm action">
+				<div class="confirm-content">
+					<p id="confirm-message"></p>
+					<div class="confirm-buttons">
+						<button id="confirm-yes">Yes</button>
+						<button id="confirm-no">No</button>
+					</div>
+				</div>
+			</div>
+			<script>
+				document.addEventListener('htmx:beforeOnLoad', function(evt) {
+					if (evt.detail.xhr.status >= 400) {
+						evt.stopPropagation();
+					}
+				});
+
+				document.addEventListener('htmx:afterRequest', function(evt) {
+					var header = evt.detail.xhr.getResponseHeader('HX-Trigger');
+					if (header) {
+						try {
+							var data = JSON.parse(header);
+							if (data.showToast) {
+								showToast(data.showToast.message, data.showToast.type || 'info');
+							}
+						} catch(e) {}
+					}
+					if (evt.detail.failed) {
+						var msg = evt.detail.xhr.responseText || 'Request failed';
+						showToast(msg, 'error');
+					}
+				});
+
+				document.addEventListener('htmx:confirm', function(evt) {
+					if (!evt.detail.question) return;
+					evt.preventDefault();
+					var dialog = document.getElementById('confirm-dialog');
+					var msg = document.getElementById('confirm-message');
+					msg.textContent = evt.detail.question;
+					dialog.classList.add('show');
+					dialog.querySelector('#confirm-yes').onclick = function() {
+						dialog.classList.remove('show');
+						evt.detail.issueRequest(true);
+					};
+					dialog.querySelector('#confirm-no').onclick = function() {
+						dialog.classList.remove('show');
+					};
+				});
+
+				function showToast(msg, type) {
+					var t = document.getElementById('toast');
+					t.textContent = msg;
+					t.className = 'toast toast-' + (type || 'info');
+					t.hidden = false;
+					t.style.animation = 'none';
+					void t.offsetHeight;
+					t.style.animation = '';
+					setTimeout(function() { t.hidden = true; }, 3000);
+				}
+
+				function copyInvite() {
+					var input = document.querySelector('.invite-link input');
+					if (input) {
+						navigator.clipboard.writeText(input.value).then(function() {
+							showToast('Link copied!', 'success');
+						});
+					}
+				}
+			</script>
 		</body>
 	</html>
 }

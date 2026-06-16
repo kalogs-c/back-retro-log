@@ -10,6 +10,33 @@ import (
 	"database/sql"
 )
 
+const countCatalogEntries = `-- name: CountCatalogEntries :one
+SELECT COUNT(*) FROM catalog_entries WHERE user_id = ?
+`
+
+func (q *Queries) CountCatalogEntries(ctx context.Context, userID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCatalogEntries, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countCatalogEntriesByStatus = `-- name: CountCatalogEntriesByStatus :one
+SELECT COUNT(*) FROM catalog_entries WHERE user_id = ? AND status = ?
+`
+
+type CountCatalogEntriesByStatusParams struct {
+	UserID int64
+	Status string
+}
+
+func (q *Queries) CountCatalogEntriesByStatus(ctx context.Context, arg CountCatalogEntriesByStatusParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCatalogEntriesByStatus, arg.UserID, arg.Status)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createCatalogEntry = `-- name: CreateCatalogEntry :one
 INSERT INTO catalog_entries (user_id, game_id, status)
 VALUES (?, ?, ?)
@@ -118,7 +145,14 @@ FROM catalog_entries ce
 JOIN games g ON ce.game_id = g.id
 WHERE ce.user_id = ?
 ORDER BY ce.updated_at DESC
+LIMIT ? OFFSET ?
 `
+
+type ListCatalogEntriesParams struct {
+	UserID int64
+	Limit  int64
+	Offset int64
+}
 
 type ListCatalogEntriesRow struct {
 	ID          int64
@@ -133,8 +167,8 @@ type ListCatalogEntriesRow struct {
 	ReleaseDate sql.NullString
 }
 
-func (q *Queries) ListCatalogEntries(ctx context.Context, userID int64) ([]ListCatalogEntriesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listCatalogEntries, userID)
+func (q *Queries) ListCatalogEntries(ctx context.Context, arg ListCatalogEntriesParams) ([]ListCatalogEntriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCatalogEntries, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -174,11 +208,14 @@ FROM catalog_entries ce
 JOIN games g ON ce.game_id = g.id
 WHERE ce.user_id = ? AND ce.status = ?
 ORDER BY ce.updated_at DESC
+LIMIT ? OFFSET ?
 `
 
 type ListCatalogEntriesByStatusParams struct {
 	UserID int64
 	Status string
+	Limit  int64
+	Offset int64
 }
 
 type ListCatalogEntriesByStatusRow struct {
@@ -195,7 +232,12 @@ type ListCatalogEntriesByStatusRow struct {
 }
 
 func (q *Queries) ListCatalogEntriesByStatus(ctx context.Context, arg ListCatalogEntriesByStatusParams) ([]ListCatalogEntriesByStatusRow, error) {
-	rows, err := q.db.QueryContext(ctx, listCatalogEntriesByStatus, arg.UserID, arg.Status)
+	rows, err := q.db.QueryContext(ctx, listCatalogEntriesByStatus,
+		arg.UserID,
+		arg.Status,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -203,6 +245,67 @@ func (q *Queries) ListCatalogEntriesByStatus(ctx context.Context, arg ListCatalo
 	var items []ListCatalogEntriesByStatusRow
 	for rows.Next() {
 		var i ListCatalogEntriesByStatusRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.GameID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.CoverUrl,
+			&i.Description,
+			&i.ReleaseDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchCatalogEntries = `-- name: SearchCatalogEntries :many
+SELECT ce.id, ce.user_id, ce.game_id, ce.status, ce.created_at, ce.updated_at,
+       g.title, g.cover_url, g.description, g.release_date
+FROM catalog_entries ce
+JOIN games g ON ce.game_id = g.id
+WHERE ce.user_id = ? AND g.title LIKE ?
+ORDER BY ce.updated_at DESC
+`
+
+type SearchCatalogEntriesParams struct {
+	UserID int64
+	Title  string
+}
+
+type SearchCatalogEntriesRow struct {
+	ID          int64
+	UserID      int64
+	GameID      int64
+	Status      string
+	CreatedAt   string
+	UpdatedAt   string
+	Title       string
+	CoverUrl    sql.NullString
+	Description sql.NullString
+	ReleaseDate sql.NullString
+}
+
+func (q *Queries) SearchCatalogEntries(ctx context.Context, arg SearchCatalogEntriesParams) ([]SearchCatalogEntriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchCatalogEntries, arg.UserID, arg.Title)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchCatalogEntriesRow
+	for rows.Next() {
+		var i SearchCatalogEntriesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,

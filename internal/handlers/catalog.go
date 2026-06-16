@@ -17,27 +17,67 @@ func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(CtxUserID).(int64)
 	status := r.URL.Query().Get("status")
 
-	entries, err := h.Queries.ListCatalogEntries(r.Context(), userID)
-	if err != nil {
-		http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
-		return
+	pageStr := r.URL.Query().Get("page")
+	page, _ := strconv.Atoi(pageStr)
+	if page < 1 {
+		page = 1
 	}
+	limit := int64(20)
+	offset := int64((page - 1) * int(limit))
+
+	var entries []db.ListCatalogEntriesRow
+	var total int64
+	var err error
 
 	if status != "" {
-		filtered := make([]db.ListCatalogEntriesRow, 0, len(entries))
-		for _, e := range entries {
-			if e.Status == status {
-				filtered = append(filtered, e)
-			}
+		statusRows, err := h.Queries.ListCatalogEntriesByStatus(r.Context(), db.ListCatalogEntriesByStatusParams{
+			UserID: userID,
+			Status: status,
+			Limit:  limit,
+			Offset: offset,
+		})
+		if err != nil {
+			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			return
 		}
-		entries = filtered
+		entries = make([]db.ListCatalogEntriesRow, len(statusRows))
+		for i, e := range statusRows {
+			entries[i] = db.ListCatalogEntriesRow(e)
+		}
+		cnt, err := h.Queries.CountCatalogEntriesByStatus(r.Context(), db.CountCatalogEntriesByStatusParams{
+			UserID: userID,
+			Status: status,
+		})
+		if err != nil {
+			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			return
+		}
+		total = cnt
+	} else {
+		entries, err = h.Queries.ListCatalogEntries(r.Context(), db.ListCatalogEntriesParams{
+			UserID: userID,
+			Limit:  limit,
+			Offset: offset,
+		})
+		if err != nil {
+			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			return
+		}
+		cnt, err := h.Queries.CountCatalogEntries(r.Context(), userID)
+		if err != nil {
+			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			return
+		}
+		total = cnt
 	}
+
+	totalPages := (int(total) + int(limit) - 1) / int(limit)
 
 	isHTMX := r.Header.Get("HX-Request") == "true"
 	if isHTMX {
-		ui.CatalogCardList(entries).Render(r.Context(), w)
+		ui.CatalogCardList(entries, page, totalPages, status).Render(r.Context(), w)
 	} else {
-		ui.Layout("Catalog", true, ui.CatalogPage(entries, status)).Render(r.Context(), w)
+		ui.Layout("Catalog", true, ui.CatalogPage(entries, status, page, totalPages)).Render(r.Context(), w)
 	}
 }
 
@@ -146,6 +186,8 @@ func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("HX-Trigger", `{"showToast":{"message":"Status updated","type":"success"}}`)
+
 	row := db.ListCatalogEntriesRow{
 		ID:          entry.ID,
 		UserID:      entry.UserID,
@@ -159,6 +201,42 @@ func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		ReleaseDate: entry.ReleaseDate,
 	}
 	ui.CatalogCard(row).Render(r.Context(), w)
+}
+
+func (h *CatalogHandler) Search(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(CtxUserID).(int64)
+	q := r.URL.Query().Get("q")
+	status := r.URL.Query().Get("status")
+
+	results, err := h.Queries.SearchCatalogEntries(r.Context(), db.SearchCatalogEntriesParams{
+		UserID: userID,
+		Title:  "%" + q + "%",
+	})
+	if err != nil {
+		http.Error(w, "Search failed", http.StatusInternalServerError)
+		return
+	}
+
+	entries := make([]db.ListCatalogEntriesRow, 0, len(results))
+	for _, e := range results {
+		if status != "" && e.Status != status {
+			continue
+		}
+		entries = append(entries, db.ListCatalogEntriesRow{
+			ID:          e.ID,
+			UserID:      e.UserID,
+			GameID:      e.GameID,
+			Status:      e.Status,
+			CreatedAt:   e.CreatedAt,
+			UpdatedAt:   e.UpdatedAt,
+			Title:       e.Title,
+			CoverUrl:    e.CoverUrl,
+			Description: e.Description,
+			ReleaseDate: e.ReleaseDate,
+		})
+	}
+
+	ui.CatalogCardList(entries, 1, 1, status).Render(r.Context(), w)
 }
 
 func (h *CatalogHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -179,5 +257,6 @@ func (h *CatalogHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("HX-Trigger", `{"showToast":{"message":"Game removed","type":"success"}}`)
 	w.WriteHeader(http.StatusOK)
 }

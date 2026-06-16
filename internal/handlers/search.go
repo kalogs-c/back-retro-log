@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"back-retro-log/internal/providers"
 	"back-retro-log/ui"
@@ -22,11 +23,19 @@ func (h *SearchHandler) Results(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	games, err := h.Provider.Search(r.Context(), query)
+	pageStr := r.URL.Query().Get("page")
+	page, _ := strconv.Atoi(pageStr)
+	if page < 1 {
+		page = 1
+	}
+
+	games, total, err := h.Provider.Search(r.Context(), query, page)
 	if err != nil {
 		http.Error(w, "Search failed: "+err.Error(), http.StatusBadGateway)
 		return
 	}
 
-	ui.SearchResults(games, query).Render(r.Context(), w)
+	totalPages := (total + providers.PageSize - 1) / providers.PageSize
+
+	ui.SearchResults(games, query, page, totalPages).Render(r.Context(), w)
 }
