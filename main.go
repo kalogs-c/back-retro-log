@@ -15,6 +15,7 @@ import (
 	"back-retro-log/internal/auth"
 	"back-retro-log/internal/config"
 	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
 	"back-retro-log/internal/providers"
 
 	_ "modernc.org/sqlite"
@@ -58,7 +59,12 @@ func main() {
 		baseURL = "http://localhost:3000"
 	}
 
-	router := app.NewRouter(queries, sessionMgr, gameProvider, baseURL, staticFS)
+	localeStore := i18n.NewStore()
+	if err := localeStore.Load(); err != nil {
+		log.Fatalf("Failed to load locales: %v", err)
+	}
+
+	router := app.NewRouter(queries, sessionMgr, gameProvider, baseURL, staticFS, localeStore)
 
 	go func() {
 		sessionMgr.Cleanup()

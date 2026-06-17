@@ -2,6 +2,7 @@ package ui
 
 import (
 	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
 	"fmt"
 )
 
@@ -24,15 +25,15 @@ templ EntryRow(entry db.ListCatalogEntriesRow) {
 						if s == entry.Status {
 							selected
 						}
-					>{ StatusLabels[s] }</option>
+					>{ StatusLabel(ctx, s) }</option>
 				}
 			</select>
 		</td>
 		<td class="actions">
 			<button
 				hx-delete={ fmt.Sprintf("/catalog/%d", entry.ID) }
-				hx-confirm="Remove this game from your catalog?"
-			>Remove</button>
+				hx-confirm={ i18n.T(ctx, "catalog_remove_confirm") }
+			>{ i18n.T(ctx, "catalog_remove") }</button>
 		</td>
 	</tr>
 }
@@ -52,7 +53,7 @@ templ CatalogCard(entry db.ListCatalogEntriesRow) {
 		<div class="card-actions">
 			<select
 				name="status"
-				aria-label={ fmt.Sprintf("Status for %s", entry.Title) }
+				aria-label={ i18n.T(ctx, "aria_status_for", entry.Title) }
 				hx-put={ fmt.Sprintf("/catalog/%d/status", entry.ID) }
 				hx-trigger="change"
 				hx-target={ fmt.Sprintf("#card-%d", entry.ID) }
@@ -64,19 +65,19 @@ templ CatalogCard(entry db.ListCatalogEntriesRow) {
 						if s == entry.Status {
 							selected
 						}
-					>{ StatusLabels[s] }</option>
+					>{ StatusLabel(ctx, s) }</option>
 				}
 			</select>
 			<button
 				hx-delete={ fmt.Sprintf("/catalog/%d", entry.ID) }
-				hx-confirm="Remove this game from your catalog?"
+				hx-confirm={ i18n.T(ctx, "catalog_remove_confirm") }
 				hx-target="closest .game-card"
 				hx-swap="delete"
 				hx-indicator="closest .card-actions"
 				class="remove-btn"
-				aria-label={ fmt.Sprintf("Remove %s", entry.Title) }
-			>Remove</button>
-			<span class="htmx-indicator loading-spinner" aria-label="Loading"></span>
+				aria-label={ i18n.T(ctx, "aria_remove", entry.Title) }
+			>{ i18n.T(ctx, "catalog_remove") }</button>
+			<span class="htmx-indicator loading-spinner" aria-label={ i18n.T(ctx, "aria_loading") }></span>
 		</div>
 	</div>
 }
@@ -87,7 +88,7 @@ templ CatalogCardList(entries []db.ListCatalogEntriesRow, page int, totalPages i
 			@CatalogCard(e)
 		}
 		if len(entries) == 0 {
-			<p class="empty">No games yet. <a href="/search">Add some!</a></p>
+			<p class="empty">{ i18n.T(ctx, "catalog_empty") } <a href="/search">{ i18n.T(ctx, "catalog_empty_add") }</a></p>
 		}
 	</div>
 	if totalPages > 1 {
@@ -99,10 +100,10 @@ templ CatalogCardList(entries []db.ListCatalogEntriesRow, page int, totalPages i
 					hx-target="#catalog-cards"
 					hx-push-url="true"
 					class="button"
-					aria-label="Previous page"
-				>Previous</a>
+					aria-label={ i18n.T(ctx, "aria_previous") }
+				>{ i18n.T(ctx, "catalog_previous") }</a>
 			}
-			<span class="page-info">Page { page } of { totalPages }</span>
+			<span class="page-info">{ i18n.T(ctx, "catalog_page", page, totalPages) }</span>
 			if page < totalPages {
 				<a
 					href="#"
@@ -110,8 +111,8 @@ templ CatalogCardList(entries []db.ListCatalogEntriesRow, page int, totalPages i
 					hx-target="#catalog-cards"
 					hx-push-url="true"
 					class="button"
-					aria-label="Next page"
-				>Next</a>
+					aria-label={ i18n.T(ctx, "aria_next") }
+				>{ i18n.T(ctx, "catalog_next") }</a>
 			}
 		</div>
 	}
@@ -131,7 +132,7 @@ templ EntryList(entries []db.ListCatalogEntriesRow) {
 				@EntryRow(e)
 			}
 			if len(entries) == 0 {
-				<tr><td colspan="3">No games yet. <a href="/search">Search and add some!</a></td></tr>
+				<tr><td colspan="3">{ i18n.T(ctx, "catalog_empty") } <a href="/search">{ i18n.T(ctx, "catalog_empty_add") }</a></td></tr>
 			}
 		</tbody>
 	</table>

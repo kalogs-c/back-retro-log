@@ -1,73 +1,88 @@
 package ui
 
 import (
+	"back-retro-log/internal/i18n"
 	"back-retro-log/internal/providers"
 	"fmt"
 )
 
 templ SearchPage() {
-	<h1>Search Games</h1>
-	<form hx-get="/search/results" hx-target="#search-results" hx-trigger="submit">
-		<input type="text" name="q" placeholder="Search for a game..." aria-label="Search for games to add to your catalog" required>
-		<button type="submit">Search</button>
+	<h1>{ i18n.T(ctx, "search_title") }</h1>
+	<form hx-get="/search" hx-trigger="submit" hx-target="#search-results" hx-push-url="true" hx-indicator="closest form">
+		<input
+			type="text"
+			name="q"
+			placeholder={ i18n.T(ctx, "search_placeholder") }
+			class="search-input"
+			aria-label={ i18n.T(ctx, "aria_search_games") }
+		>
+		<button type="submit" class="search-button">{ i18n.T(ctx, "search_button") }</button>
+		<span class="htmx-indicator loading-spinner" aria-label={ i18n.T(ctx, "aria_loading") }></span>
 	</form>
-	<div id="search-results" role="region" aria-live="polite" aria-label="Search results"></div>
+	<div id="search-results" role="region" aria-live="polite" aria-label={ i18n.T(ctx, "aria_search_results") }>
+		<p>{ i18n.T(ctx, "search_prompt") }</p>
+	</div>
 }
 
-templ SearchResults(games []providers.Game, query string, page int, totalPages int) {
-	if len(games) == 0 {
-		<p>No results found for "{ query }".</p>
-		return
-	}
-	<div class="search-results">
-		for _, g := range games {
-		<div class="game-card" id={ fmt.Sprintf("g-%d", g.RawgID) }>
-			<div class="card-top">
-				if g.CoverURL != "" {
-					<img src={ g.CoverURL } alt={ g.Title } class="cover"/>
-				} else {
-					<div class="cover-placeholder"></div>
-				}
-				<div class="game-details">
-					<h3>{ g.Title }</h3>
-					if g.ReleaseDate != "" {
-						<span class="release">{ g.ReleaseDate }</span>
+templ SearchResults(results []providers.Game, query string, page int, totalResults int, totalPages int) {
+	if results != nil && query != "" {
+		<p>{ i18n.T(ctx, "search_found", len(results), totalResults) }</p>
+		<div class="search-results">
+			for _, g := range results {
+				<div class="search-result">
+					if g.CoverURL != "" {
+						<img src={ g.CoverURL } alt={ g.Title } class="cover-thumb"/>
 					}
+					<div class="result-info">
+						<h3>{ g.Title }</h3>
+						if g.ReleaseDate != "" {
+							<p>{ i18n.T(ctx, "search_year", g.ReleaseDate) }</p>
+						}
+					</div>
+					<form action="/catalog/add" method="POST" style="display:inline">
+						<input type="hidden" name="rawg_id" value={ fmt.Sprintf("%d", g.RawgID) }>
+						<input type="hidden" name="title" value={ g.Title }>
+						<input type="hidden" name="cover_url" value={ g.CoverURL }>
+						<input type="hidden" name="release_date" value={ g.ReleaseDate }>
+						<button
+							type="submit"
+							hx-post="/catalog/add"
+							hx-target="this"
+							hx-swap="outerHTML"
+							hx-indicator="closest form"
+						>{ i18n.T(ctx, "search_add") }</button>
+					</form>
 				</div>
-			</div>
-			<div class="card-actions">
-				<form action="/catalog/add" method="POST">
-					<input type="hidden" name="rawg_id" value={ fmt.Sprintf("%d", g.RawgID) }/>
-					<input type="hidden" name="title" value={ g.Title }/>
-					<input type="hidden" name="cover_url" value={ g.CoverURL }/>
-					<input type="hidden" name="release_date" value={ g.ReleaseDate }/>
-					<button type="submit">Add to Catalog</button>
-				</form>
-			</div>
+			}
 		</div>
+		if totalPages > 1 {
+			<div class="pagination">
+				if page > 1 {
+					<a
+						href="#"
+						hx-get={ fmt.Sprintf("/search?q=%s&page=%d", query, page - 1) }
+						hx-target="#search-results"
+						hx-push-url="true"
+						class="button"
+						aria-label={ i18n.T(ctx, "aria_previous") }
+					>{ i18n.T(ctx, "catalog_previous") }</a>
+				}
+				<span class="page-info">{ i18n.T(ctx, "catalog_page", page, totalPages) }</span>
+				if page < totalPages {
+					<a
+						href="#"
+						hx-get={ fmt.Sprintf("/search?q=%s&page=%d", query, page + 1) }
+						hx-target="#search-results"
+						hx-push-url="true"
+						class="button"
+						aria-label={ i18n.T(ctx, "aria_next") }
+					>{ i18n.T(ctx, "catalog_next") }</a>
+				}
+			</div>
 		}
-	</div>
-	if totalPages > 1 {
-		<div class="pagination">
-			if page > 1 {
-				<a
-					href="#"
-					hx-get={ fmt.Sprintf("/search/results?q=%s&page=%d", query, page - 1) }
-					hx-target="#search-results"
-					class="button"
-					aria-label="Previous page"
-				>Previous</a>
-			}
-			<span class="page-info">Page { page } of { totalPages }</span>
-			if page < totalPages {
-				<a
-					href="#"
-					hx-get={ fmt.Sprintf("/search/results?q=%s&page=%d", query, page + 1) }
-					hx-target="#search-results"
-					class="button"
-					aria-label="Next page"
-				>Next</a>
-			}
-		</div>
+	} else if query != "" && len(results) == 0 {
+		<p>{ i18n.T(ctx, "search_none") }</p>
+	} else {
+		<p>{ i18n.T(ctx, "search_prompt") }</p>
 	}
 }

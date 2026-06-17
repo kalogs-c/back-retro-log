@@ -1,26 +1,28 @@
 package ui
 
+import "back-retro-log/internal/i18n"
+
 templ LoginPage(errorMsg string, usersExist bool) {
 	<div class="form-page">
-		<h1>Login</h1>
+		<h1>{ i18n.T(ctx, "login_title") }</h1>
 		if errorMsg != "" {
 			<p class="error">{ errorMsg }</p>
 		}
 		<form action="/login" method="POST">
 			<label>
-				Username
+				{ i18n.T(ctx, "login_username") }
 				<input type="text" name="username" required>
 			</label>
 			<label>
-				Password
+				{ i18n.T(ctx, "login_password") }
 				<input type="password" name="password" required>
 			</label>
-			<button type="submit">Login</button>
+			<button type="submit">{ i18n.T(ctx, "login_submit") }</button>
 		</form>
 		if usersExist {
-			<p>No account? You need an invitation link to register.</p>
+			<p>{ i18n.T(ctx, "login_no_account_invite") }</p>
 		} else {
-			<p>No account? First visitor can <a href="/register">register</a>.</p>
+			<p>{ i18n.T(ctx, "login_no_account_first") } <a href="/register">{ i18n.T(ctx, "login_register_link") }</a>.</p>
 		}
 	</div>
 }

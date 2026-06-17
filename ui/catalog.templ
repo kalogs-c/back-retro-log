@@ -1,15 +1,18 @@
 package ui
 
-import "back-retro-log/internal/db"
+import (
+	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
+)
 
 templ CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string, page int, totalPages int) {
-	<h1>My Catalog</h1>
+	<h1>{ i18n.T(ctx, "catalog_title") }</h1>
 	<div class="catalog-toolbar">
 		<input
 			type="text"
 			name="q"
-			placeholder="Search catalog..."
-			aria-label="Search your catalog"
+			placeholder={ i18n.T(ctx, "catalog_search") }
+			aria-label={ i18n.T(ctx, "aria_search_catalog") }
 			hx-get="/catalog/search"
 			hx-trigger="keyup changed delay:300ms"
 			hx-target="#catalog-cards"
@@ -18,24 +21,24 @@ templ CatalogPage(entries []db.ListCatalogEntriesRow, currentStatus string, page
 		>
 		<select
 			name="status"
-			aria-label="Filter by status"
+			aria-label={ i18n.T(ctx, "aria_filter_status") }
 			hx-get="/catalog"
 			hx-trigger="change"
 			hx-target="#catalog-cards"
 			hx-push-url="true"
 			hx-indicator="closest .catalog-toolbar"
 		>
-			<option value="">All</option>
+			<option value="">{ i18n.T(ctx, "catalog_filter_all") }</option>
 			for _, s := range AllStatuses() {
 				<option value={ s }
 					if currentStatus == s {
 						selected
 					}
-				>{ StatusLabels[s] }</option>
+				>{ StatusLabel(ctx, s) }</option>
 			}
 		</select>
-		<a href="/search" class="button">+ Add Game</a>
-		<span class="htmx-indicator loading-spinner" aria-label="Loading"></span>
+		<a href="/search" class="button">{ i18n.T(ctx, "catalog_add_game") }</a>
+		<span class="htmx-indicator loading-spinner" aria-label={ i18n.T(ctx, "aria_loading") }></span>
 	</div>
 	@CatalogCardList(entries, page, totalPages, currentStatus)
 }

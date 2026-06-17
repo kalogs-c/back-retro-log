@@ -1,14 +1,11 @@
 package ui
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
 
-var StatusLabels = map[string]string{
-	"one_day_i_play":    "One day I play",
-	"finished":          "Finished",
-	"didnt_liked":       "Didn't liked",
-	"maybe_i_come_back": "Maybe I come back",
-	"library":           "Library",
-}
+	"back-retro-log/internal/i18n"
+)
 
 func AllStatuses() []string {
 	return []string{
@@ -18,6 +15,10 @@ func AllStatuses() []string {
 		"maybe_i_come_back",
 		"library",
 	}
+}
+
+func StatusLabel(ctx context.Context, status string) string {
+	return i18n.T(ctx, "status_"+status)
 }
 
 func StrVal(ns sql.NullString) string {

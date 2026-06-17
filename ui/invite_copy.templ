@@ -1,0 +1,11 @@
+package ui
+
+import "back-retro-log/internal/i18n"
+
+templ InviteCopyResult(success bool) {
+	if success {
+		<p class="success">{ i18n.T(ctx, "invite_copy_success") }</p>
+	} else {
+		<p class="error">{ i18n.T(ctx, "invite_copy_error") }</p>
+	}
+}

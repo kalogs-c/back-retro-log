@@ -1,44 +1,56 @@
 package ui
 
-import "back-retro-log/internal/db"
+import (
+	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
+)
 
 templ InvitePage(invitations []db.Invitation, link string) {
-	<h1>Invitations</h1>
-	if link != "" {
-		<div class="invite-link">
-			<p>Share this link (expires in 24h):</p>
-			<div class="invite-row">
-				<input type="text" readonly value={ link }>
-				<button type="button" class="copy-btn" onclick="copyInvite()" aria-label="Copy invitation link">Copy</button>
+	<div class="form-page">
+		<h1>{ i18n.T(ctx, "invite_title") }</h1>
+		if link != "" {
+			<p>{ i18n.T(ctx, "invite_instructions") }</p>
+			<div class="invite-link-container">
+				<input type="text" value={ link } id="invite-link" readonly>
+			<button
+				id="copy-button"
+				onclick="navigator.clipboard.writeText(document.getElementById('invite-link').value)"
+				hx-post="/invite/copy"
+				hx-target="#copy-result"
+				hx-swap="innerHTML"
+			>{ i18n.T(ctx, "invite_copy") }</button>
 			</div>
-		</div>
-	}
-	<form action="/invite" method="POST">
-		<button type="submit">Generate Invitation</button>
-	</form>
-	<h2>Previous Invitations</h2>
-	<table>
-		<thead>
-			<tr>
-				<th>Token</th>
-				<th>Expires</th>
-				<th>Used</th>
-			</tr>
-		</thead>
-		<tbody>
-			for _, inv := range invitations {
-				<tr>
-					<td><code>{ inv.Token[:8] }...</code></td>
-					<td>{ inv.ExpiresAt }</td>
-					<td>
-						if inv.UsedBy.Valid {
-							Used
-						} else {
-							Pending
-						}
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+			<div id="copy-result"></div>
+		}
+		<form action="/invite" method="POST" style="margin: 1rem 0">
+			<button type="submit" class="button">{ i18n.T(ctx, "invite_new") }</button>
+		</form>
+		if len(invitations) > 0 {
+			<h2>{ i18n.T(ctx, "invite_previous_title") }</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>{ i18n.T(ctx, "invite_token") }</th>
+						<th>{ i18n.T(ctx, "invite_expires") }</th>
+						<th>{ i18n.T(ctx, "invite_used") }</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, inv := range invitations {
+						<tr>
+							<td><code>{ inv.Token[:16] }...</code></td>
+							<td>{ inv.ExpiresAt }</td>
+							<td>
+								if inv.UsedBy.Valid {
+									{ i18n.T(ctx, "invite_used_status") }
+								} else {
+									{ i18n.T(ctx, "invite_pending_status") }
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	</div>
 }

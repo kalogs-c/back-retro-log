@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
 	"back-retro-log/ui"
 )
 
@@ -14,6 +16,7 @@ type CatalogHandler struct {
 }
 
 func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
+	loc := i18n.FromContext(r.Context())
 	userID := r.Context().Value(CtxUserID).(int64)
 	status := r.URL.Query().Get("status")
 
@@ -37,7 +40,7 @@ func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
 			Offset: offset,
 		})
 		if err != nil {
-			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			http.Error(w, loc.T("error_failed_load"), http.StatusInternalServerError)
 			return
 		}
 		entries = make([]db.ListCatalogEntriesRow, len(statusRows))
@@ -49,7 +52,7 @@ func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
 			Status: status,
 		})
 		if err != nil {
-			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			http.Error(w, loc.T("error_failed_load"), http.StatusInternalServerError)
 			return
 		}
 		total = cnt
@@ -60,12 +63,12 @@ func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
 			Offset: offset,
 		})
 		if err != nil {
-			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			http.Error(w, loc.T("error_failed_load"), http.StatusInternalServerError)
 			return
 		}
 		cnt, err := h.Queries.CountCatalogEntries(r.Context(), userID)
 		if err != nil {
-			http.Error(w, "Failed to load catalog", http.StatusInternalServerError)
+			http.Error(w, loc.T("error_failed_load"), http.StatusInternalServerError)
 			return
 		}
 		total = cnt
@@ -77,13 +80,15 @@ func (h *CatalogHandler) List(w http.ResponseWriter, r *http.Request) {
 	if isHTMX {
 		ui.CatalogCardList(entries, page, totalPages, status).Render(r.Context(), w)
 	} else {
-		ui.Layout("Catalog", true, ui.CatalogPage(entries, status, page, totalPages)).Render(r.Context(), w)
+		ui.Layout(true, ui.CatalogPage(entries, status, page, totalPages)).Render(r.Context(), w)
 	}
 }
 
 func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
+	loc := i18n.FromContext(r.Context())
+
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(w, loc.T("error_bad_request"), http.StatusBadRequest)
 		return
 	}
 	userID := r.Context().Value(CtxUserID).(int64)
@@ -110,7 +115,7 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		} else {
-			http.Error(w, "Invalid rawg_id", http.StatusBadRequest)
+			http.Error(w, loc.T("error_invalid_rawg"), http.StatusBadRequest)
 			return
 		}
 	} else {
@@ -123,7 +128,7 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	if err != nil {
-		http.Error(w, "Failed to save game", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_failed_save"), http.StatusInternalServerError)
 		return
 	}
 
@@ -132,10 +137,10 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 		GameID: game.ID,
 	})
 	if err == nil {
-		http.Error(w, "Game already in your catalog", http.StatusConflict)
+		http.Error(w, loc.T("toast_duplicate"), http.StatusConflict)
 		return
 	} else if err != sql.ErrNoRows {
-		http.Error(w, "Internal error", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_internal"), http.StatusInternalServerError)
 		return
 	}
 
@@ -145,7 +150,7 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 		Status: "library",
 	})
 	if err != nil {
-		http.Error(w, "Failed to add game", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_failed_add"), http.StatusInternalServerError)
 		return
 	}
 
@@ -153,16 +158,17 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
+	loc := i18n.FromContext(r.Context())
 	userID := r.Context().Value(CtxUserID).(int64)
 	idStr := r.PathValue("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
+		http.Error(w, loc.T("error_invalid_id"), http.StatusBadRequest)
 		return
 	}
 
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(w, loc.T("error_bad_request"), http.StatusBadRequest)
 		return
 	}
 	status := r.FormValue("status")
@@ -173,7 +179,7 @@ func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		Status: status,
 	})
 	if err != nil {
-		http.Error(w, "Failed to update status", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_failed_update"), http.StatusInternalServerError)
 		return
 	}
 
@@ -182,11 +188,11 @@ func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		UserID: userID,
 	})
 	if err != nil {
-		http.Error(w, "Entry not found", http.StatusNotFound)
+		http.Error(w, loc.T("error_not_found"), http.StatusNotFound)
 		return
 	}
 
-	w.Header().Set("HX-Trigger", `{"showToast":{"message":"Status updated","type":"success"}}`)
+	w.Header().Set("HX-Trigger", fmt.Sprintf(`{"showToast":{"message":"%s","type":"success"}}`, loc.T("toast_status_updated")))
 
 	row := db.ListCatalogEntriesRow{
 		ID:          entry.ID,
@@ -204,6 +210,7 @@ func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CatalogHandler) Search(w http.ResponseWriter, r *http.Request) {
+	loc := i18n.FromContext(r.Context())
 	userID := r.Context().Value(CtxUserID).(int64)
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
@@ -213,7 +220,7 @@ func (h *CatalogHandler) Search(w http.ResponseWriter, r *http.Request) {
 		Title:  "%" + q + "%",
 	})
 	if err != nil {
-		http.Error(w, "Search failed", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_failed_search"), http.StatusInternalServerError)
 		return
 	}
 
@@ -240,11 +247,12 @@ func (h *CatalogHandler) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CatalogHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	loc := i18n.FromContext(r.Context())
 	userID := r.Context().Value(CtxUserID).(int64)
 	idStr := r.PathValue("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid entry ID", http.StatusBadRequest)
+		http.Error(w, loc.T("error_invalid_id"), http.StatusBadRequest)
 		return
 	}
 
@@ -253,10 +261,10 @@ func (h *CatalogHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		UserID: userID,
 	})
 	if err != nil {
-		http.Error(w, "Failed to delete entry", http.StatusInternalServerError)
+		http.Error(w, loc.T("error_failed_delete"), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("HX-Trigger", `{"showToast":{"message":"Game removed","type":"success"}}`)
+	w.Header().Set("HX-Trigger", fmt.Sprintf(`{"showToast":{"message":"%s","type":"success"}}`, loc.T("toast_game_removed")))
 	w.WriteHeader(http.StatusOK)
 }

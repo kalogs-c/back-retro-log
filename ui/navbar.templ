@@ -1,16 +1,26 @@
 package ui
 
+import "back-retro-log/internal/i18n"
+
 templ Navbar(loggedIn bool) {
 	<nav>
-		<a href="/" aria-label="Home">BackRetroLog</a>
-		if loggedIn {
-			<div class="nav-links">
-				<a href="/catalog">Catalog</a>
-				<a href="/invite">Invites</a>
+		<a href="/" aria-label={ i18n.T(ctx, "aria_home") }>{ i18n.T(ctx, "brand") }</a>
+		<div class="nav-links">
+			if loggedIn {
+				<a href="/catalog">{ i18n.T(ctx, "nav_catalog") }</a>
+				<a href="/invite">{ i18n.T(ctx, "nav_invites") }</a>
 				<form action="/logout" method="POST" class="logout-form">
-					<button type="submit">Logout</button>
+					<button type="submit">{ i18n.T(ctx, "nav_logout") }</button>
 				</form>
-			</div>
-		}
+			}
+			<a href="#" onclick="setLang('pt-BR')" class="lang-link">PT</a>
+			<a href="#" onclick="setLang('en')" class="lang-link">EN</a>
+		</div>
 	</nav>
+	<script>
+		function setLang(lang) {
+			document.cookie = 'lang=' + lang + ';path=/;max-age=' + (86400*365);
+			location.reload();
+		}
+	</script>
 }

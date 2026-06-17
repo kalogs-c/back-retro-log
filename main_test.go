@@ -12,6 +12,7 @@ import (
 	"back-retro-log/internal/app"
 	"back-retro-log/internal/auth"
 	"back-retro-log/internal/db"
+	"back-retro-log/internal/i18n"
 	"back-retro-log/internal/providers"
 
 	_ "modernc.org/sqlite"
@@ -36,7 +37,11 @@ func testApp(t *testing.T) (queries *db.Queries, sessions *auth.SessionManager, 
 	queries = db.New(sqlDB)
 	sessions = auth.NewSessionManager(queries)
 	provider := providers.NewDummy()
-	router = app.NewRouter(queries, sessions, provider, "http://test.local", staticFS)
+	localeStore := i18n.NewStore()
+	if err := localeStore.Load(); err != nil {
+		t.Fatalf("failed to load locale store: %v", err)
+	}
+	router = app.NewRouter(queries, sessions, provider, "http://test.local", staticFS, localeStore)
 	return
 }
 

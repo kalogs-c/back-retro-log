@@ -8,7 +8,9 @@ package ui
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Layout(title string, loggedIn bool, content templ.Component) templ.Component {
+import "back-retro-log/internal/i18n"
+
+func Layout(loggedIn bool, contents templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,20 +31,46 @@ func Layout(title string, loggedIn bool, content templ.Component) templ.Componen
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(i18n.T(ctx, "html_lang"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 9, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 7, Col: 38}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - BackRetroLog</title><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body><a href=\"#main-content\" class=\"skip-link\">Skip to content</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "html_title"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 11, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</title><script src=\"https://unpkg.com/htmx.org@2.0.3\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body><a href=\"#main-content\" class=\"skip-link\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "skip_link"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 16, Col: 71}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,15 +78,41 @@ func Layout(title string, loggedIn bool, content templ.Component) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<main id=\"main-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<main id=\"main-content\" role=\"main\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = content.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = contents.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</main><div id=\"toast\" class=\"toast\" hidden role=\"status\" aria-live=\"polite\"></div><div id=\"confirm-dialog\" class=\"confirm-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Confirm action\"><div class=\"confirm-content\"><p id=\"confirm-message\"></p><div class=\"confirm-buttons\"><button id=\"confirm-yes\">Yes</button> <button id=\"confirm-no\">No</button></div></div></div><script>\n\t\t\t\tdocument.addEventListener('htmx:beforeOnLoad', function(evt) {\n\t\t\t\t\tif (evt.detail.xhr.status >= 400) {\n\t\t\t\t\t\tevt.stopPropagation();\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\t\t\tvar header = evt.detail.xhr.getResponseHeader('HX-Trigger');\n\t\t\t\t\tif (header) {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tvar data = JSON.parse(header);\n\t\t\t\t\t\t\tif (data.showToast) {\n\t\t\t\t\t\t\t\tshowToast(data.showToast.message, data.showToast.type || 'info');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} catch(e) {}\n\t\t\t\t\t}\n\t\t\t\t\tif (evt.detail.failed) {\n\t\t\t\t\t\tvar msg = evt.detail.xhr.responseText || 'Request failed';\n\t\t\t\t\t\tshowToast(msg, 'error');\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tdocument.addEventListener('htmx:confirm', function(evt) {\n\t\t\t\t\tif (!evt.detail.question) return;\n\t\t\t\t\tevt.preventDefault();\n\t\t\t\t\tvar dialog = document.getElementById('confirm-dialog');\n\t\t\t\t\tvar msg = document.getElementById('confirm-message');\n\t\t\t\t\tmsg.textContent = evt.detail.question;\n\t\t\t\t\tdialog.classList.add('show');\n\t\t\t\t\tdialog.querySelector('#confirm-yes').onclick = function() {\n\t\t\t\t\t\tdialog.classList.remove('show');\n\t\t\t\t\t\tevt.detail.issueRequest(true);\n\t\t\t\t\t};\n\t\t\t\t\tdialog.querySelector('#confirm-no').onclick = function() {\n\t\t\t\t\t\tdialog.classList.remove('show');\n\t\t\t\t\t};\n\t\t\t\t});\n\n\t\t\t\tfunction showToast(msg, type) {\n\t\t\t\t\tvar t = document.getElementById('toast');\n\t\t\t\t\tt.textContent = msg;\n\t\t\t\t\tt.className = 'toast toast-' + (type || 'info');\n\t\t\t\t\tt.hidden = false;\n\t\t\t\t\tt.style.animation = 'none';\n\t\t\t\t\tvoid t.offsetHeight;\n\t\t\t\t\tt.style.animation = '';\n\t\t\t\t\tsetTimeout(function() { t.hidden = true; }, 3000);\n\t\t\t\t}\n\n\t\t\t\tfunction copyInvite() {\n\t\t\t\t\tvar input = document.querySelector('.invite-link input');\n\t\t\t\t\tif (input) {\n\t\t\t\t\t\tnavigator.clipboard.writeText(input.value).then(function() {\n\t\t\t\t\t\t\tshowToast('Link copied!', 'success');\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</main><div id=\"toast\" role=\"status\" aria-live=\"polite\" class=\"toast hidden\"></div><div id=\"confirm-dialog\" role=\"dialog\" aria-modal=\"true\" class=\"confirm-dialog hidden\"><div class=\"confirm-content\"><p id=\"confirm-message\"></p><div class=\"confirm-actions\"><button id=\"confirm-cancel\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "confirm_cancel"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 26, Col: 65}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</button> <button id=\"confirm-ok\" class=\"button\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(i18n.T(ctx, "confirm_ok"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 27, Col: 72}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</button></div></div></div><script>\n\t\t\t\tdocument.body.addEventListener('showToast', function(evt) {\n\t\t\t\t\tvar toast = document.getElementById('toast');\n\t\t\t\t\ttoast.textContent = evt.detail.message;\n\t\t\t\t\ttoast.className = 'toast show toast-' + (evt.detail.type || 'info');\n\t\t\t\t\tsetTimeout(function() { toast.className = 'toast hidden'; }, 3000);\n\t\t\t\t});\n\t\t\t\tdocument.body.addEventListener('htmx:confirm', function(evt) {\n\t\t\t\t\tif (!evt.detail.question) return;\n\t\t\t\t\tevt.preventDefault();\n\t\t\t\t\tvar dialog = document.getElementById('confirm-dialog');\n\t\t\t\t\tvar msg = document.getElementById('confirm-message');\n\t\t\t\t\tmsg.textContent = evt.detail.question;\n\t\t\t\t\tdialog.className = 'confirm-dialog show';\n\t\t\t\t\tvar confirmed = false;\n\t\t\t\t\tdocument.getElementById('confirm-ok').onclick = function() {\n\t\t\t\t\t\tconfirmed = true;\n\t\t\t\t\t\tdialog.className = 'confirm-dialog hidden';\n\t\t\t\t\t\tevt.detail.issueRequest(true);\n\t\t\t\t\t};\n\t\t\t\t\tdocument.getElementById('confirm-cancel').onclick = function() {\n\t\t\t\t\t\tdialog.className = 'confirm-dialog hidden';\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\t\tfunction setLang(lang) {\n\t\t\t\t\tdocument.cookie = 'lang=' + lang + ';path=/;max-age=' + (86400*365);\n\t\t\t\t\tlocation.reload();\n\t\t\t\t}\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
