@@ -154,7 +154,12 @@ func (h *CatalogHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/catalog", http.StatusSeeOther)
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/catalog")
+		w.WriteHeader(http.StatusOK)
+	} else {
+		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
+	}
 }
 
 func (h *CatalogHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {

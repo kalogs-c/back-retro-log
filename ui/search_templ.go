@@ -48,7 +48,7 @@ func SearchPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><form hx-get=\"/search\" hx-trigger=\"submit\" hx-target=\"#search-results\" hx-push-url=\"true\" hx-indicator=\"closest form\"><input type=\"text\" name=\"q\" placeholder=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><form hx-get=\"/search/results\" hx-trigger=\"submit\" hx-target=\"#search-results\" hx-push-url=\"true\" hx-indicator=\"closest form\"><input type=\"text\" name=\"q\" placeholder=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

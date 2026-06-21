@@ -8,7 +8,7 @@ import (
 
 templ SearchPage() {
 	<h1>{ i18n.T(ctx, "search_title") }</h1>
-	<form hx-get="/search" hx-trigger="submit" hx-target="#search-results" hx-push-url="true" hx-indicator="closest form">
+	<form hx-get="/search/results" hx-trigger="submit" hx-target="#search-results" hx-push-url="true" hx-indicator="closest form">
 		<input
 			type="text"
 			name="q"
